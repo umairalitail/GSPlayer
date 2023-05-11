@@ -8,12 +8,14 @@
 
 import AVFoundation
 
+@available(iOS 11.0, *)
 protocol VideoLoaderDelegate: AnyObject {
     
     func loader(_ loader: VideoLoader, didFail error: Error)
     func loaderDidFinish(_ loader: VideoLoader)
 }
 
+@available(iOS 11.0, *)
 class VideoLoader {
     
     weak var delegate: VideoLoaderDelegate?
@@ -60,6 +62,7 @@ class VideoLoader {
     
 }
 
+@available(iOS 11.0, *)
 extension VideoLoader: VideoRequestLoaderDelegate {
 
     func loader(_ loader: VideoRequestLoader, didFinish error: Error?) {

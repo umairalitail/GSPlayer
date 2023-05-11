@@ -128,24 +128,12 @@ public class VideoCacheHandler {
     
     func cache(data: Data, for range: NSRange) -> Bool {
         objc_sync_enter(writeFileHandle)
-        if #available(iOS 13.4, *) {
-            do
-            {
-                try writeFileHandle.seekToEnd()
-            }
-            catch
-            {
-                objc_sync_exit(writeFileHandle)
-                return false
-            }
-        } else {
-            // Fallback on earlier versions
-        }
         writeFileHandle.seek(toFileOffset: UInt64(range.location))
         writeFileHandle.write(data)
         configuration.add(fragment: range)
         objc_sync_exit(writeFileHandle)
         return true
+        
     }
     
     func cachedData(for range: NSRange) -> Data {
@@ -157,6 +145,12 @@ public class VideoCacheHandler {
     }
     
     func set(info: VideoInfo) {
+        if #available(iOS 11.0, *) {
+            let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+            guard videoCacheSize > 1024 * 1024 * 10 else { return }
+        } else {
+            // Fallback on earlier versions
+        }
         objc_sync_enter(writeFileHandle)
         configuration.info = info
         writeFileHandle.truncateFile(atOffset: UInt64(info.contentLength))
@@ -165,6 +159,12 @@ public class VideoCacheHandler {
     }
     
     func save() {
+        if #available(iOS 11.0, *) {
+            let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+            guard videoCacheSize > 1024 * 1024 * 10 else { return }
+        } else {
+            // Fallback on earlier versions
+        }
         objc_sync_enter(writeFileHandle)
         writeFileHandle.synchronizeFile()
         configuration.save()

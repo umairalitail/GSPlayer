@@ -40,6 +40,24 @@ public enum VideoCacheManager {
         }
     }
     
+    @available(iOS 11.0, *)
+    public static func calculateRemainingCachedSize() -> UInt {
+        let fileManager = FileManager.default
+        let resourceKeys: Set<URLResourceKey> = [.volumeAvailableCapacityForImportantUsageKey]
+        
+        let fileContents = (try? fileManager.contentsOfDirectory(at: URL(fileURLWithPath: directory), includingPropertiesForKeys: Array(resourceKeys), options: .skipsHiddenFiles)) ?? []
+        
+        return fileContents.reduce(0) { size, fileContent in
+            guard
+                let resourceValues = try? fileContent.resourceValues(forKeys: resourceKeys),
+                resourceValues.isDirectory != true,
+                let fileSize = resourceValues.volumeAvailableCapacityForImportantUsage
+                else { return size }
+            
+            return size + UInt(fileSize)
+        }
+    }
+    
     public static func cleanAllCache() throws {
         let fileManager = FileManager.default
         let fileContents = try fileManager.contentsOfDirectory(atPath: directory)
