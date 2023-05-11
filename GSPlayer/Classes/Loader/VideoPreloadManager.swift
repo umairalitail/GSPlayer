@@ -8,6 +8,7 @@
 
 import Foundation
 
+@available(iOS 11.0, *)
 public class VideoPreloadManager: NSObject {
     
     public static let shared = VideoPreloadManager()
@@ -28,8 +29,12 @@ public class VideoPreloadManager: NSObject {
         if isAutoStart { start() }
     }
     
+    @available(iOS 11.0, *)
     func start() {
-        guard downloader == nil, waitingQueue.count > 0 else {
+        let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+        
+        guard downloader == nil, waitingQueue.count > 0, videoCacheSize > 1024
+                * 1024 * 10 else {
             downloader?.resume()
             return
         }
@@ -37,13 +42,14 @@ public class VideoPreloadManager: NSObject {
         isAutoStart = true
         
         let url = waitingQueue.removeFirst()
-        
+
         guard
             !VideoLoadManager.shared.loaderMap.keys.contains(url),
-            let cacheHandler = try? VideoCacheHandler(url: url) else {
+            let cacheHandler = try? VideoCacheHandler(url: url)
+             else {
             return
         }
-        
+
         downloader = VideoDownloader(url: url, cacheHandler: cacheHandler)
         downloader?.delegate = self
         downloader?.download(from: 0, length: preloadByteCount)
@@ -71,6 +77,7 @@ public class VideoPreloadManager: NSObject {
     
 }
 
+@available(iOS 11.0, *)
 extension VideoPreloadManager: VideoDownloaderDelegate {
     
     public func downloader(_ downloader: VideoDownloader, didReceive response: URLResponse) {

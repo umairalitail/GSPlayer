@@ -8,6 +8,7 @@
 
 import AVFoundation
 
+@available(iOS 11.0, *)
 public class VideoLoadManager: NSObject {
     
     public static let shared = VideoLoadManager()
@@ -20,6 +21,7 @@ public class VideoLoadManager: NSObject {
     
 }
 
+@available(iOS 11.0, *)
 extension VideoLoadManager: AVAssetResourceLoaderDelegate {
 
     public func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
@@ -33,7 +35,8 @@ extension VideoLoadManager: AVAssetResourceLoaderDelegate {
             return false
         }
         
-        VideoPreloadManager.shared.remove(url: url)
+            VideoPreloadManager.shared.remove(url: url)
+        
         
         do {
             if let loader = loaderMap[url] {
@@ -62,6 +65,7 @@ extension VideoLoadManager: AVAssetResourceLoaderDelegate {
     
 }
 
+@available(iOS 11.0, *)
 extension VideoLoadManager: VideoLoaderDelegate {
     
     func loader(_ loader: VideoLoader, didFail error: Error) {

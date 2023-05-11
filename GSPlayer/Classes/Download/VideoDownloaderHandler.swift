@@ -57,7 +57,11 @@ class VideoDownloaderHandler {
     }
     
     func start() {
-        processActions()
+        if #available(iOS 11.0, *) {
+            processActions()
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     func cancel() {
@@ -120,7 +124,11 @@ extension VideoDownloaderHandler: VideoDownloaderSessionDelegateHandlerDelegate 
         } else {
             notifyProgress(flush: true)
             notifyFinished(error: nil)
-            processActions()
+            if #available(iOS 11.0, *) {
+                processActions()
+            } else {
+                // Fallback on earlier versions
+            }
         }
     }
     
@@ -128,6 +136,7 @@ extension VideoDownloaderHandler: VideoDownloaderSessionDelegateHandlerDelegate 
 
 private extension VideoDownloaderHandler {
     
+    @available(iOS 11.0, *)
     func processActions() {
         guard !isCancelled else { return }
         guard let action = actions.first else {

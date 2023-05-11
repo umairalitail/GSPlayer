@@ -124,7 +124,11 @@ public struct VideoCacheConfiguration: Codable {
                 )
             }
         } catch {
-            VideoLoadManager.shared.reportError?(error)
+            if #available(iOS 11.0, *) {
+                VideoLoadManager.shared.reportError?(error)
+            } else {
+                // Fallback on earlier versions
+            }
         }
     }
     

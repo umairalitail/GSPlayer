@@ -8,6 +8,7 @@
 
 import AVFoundation
 
+@available(iOS 11.0, *)
 extension AVAssetResourceLoadingRequest {
     
     var url: URL? {

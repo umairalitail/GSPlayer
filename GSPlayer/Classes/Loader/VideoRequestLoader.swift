@@ -8,12 +8,14 @@
 
 import AVFoundation
 
+@available(iOS 11.0, *)
 protocol VideoRequestLoaderDelegate: AnyObject {
     
     func loader(_ loader: VideoRequestLoader, didFinish error: Error?)
     
 }
 
+@available(iOS 11.0, *)
 class VideoRequestLoader {
     
     weak var delegate: VideoRequestLoaderDelegate?
@@ -30,6 +32,7 @@ class VideoRequestLoader {
     }
     
     func start() {
+
         guard
             let dataRequest = request.dataRequest else {
             return
@@ -65,6 +68,7 @@ class VideoRequestLoader {
     
 }
 
+@available(iOS 11.0, *)
 extension VideoRequestLoader: VideoDownloaderDelegate {
     
     func downloader(_ downloader: VideoDownloader, didReceive response: URLResponse) {
@@ -89,6 +93,7 @@ extension VideoRequestLoader: VideoDownloaderDelegate {
     
 }
 
+@available(iOS 11.0, *)
 private extension VideoRequestLoader {
     
     func fulfillContentInfomation() {

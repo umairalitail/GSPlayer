@@ -33,6 +33,7 @@ public extension AVPlayerItem {
     
 }
 
+@available(iOS 11.0, *)
 extension AVPlayerItem {
     
     static var loaderPrefix: String = "__loader__"
@@ -56,7 +57,10 @@ extension AVPlayerItem {
     }
     
     convenience init(loader url: URL) {
-        if url.isFileURL || url.pathExtension == "m3u8" {
+        let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+
+        if url.isFileURL || url.pathExtension == "m3u8" || !(videoCacheSize > 1024
+                                                             * 1024 * 10) {
             self.init(url: url)
             return
         }
@@ -72,6 +76,7 @@ extension AVPlayerItem {
         }
         
         let urlAsset = AVURLAsset(url: loaderURL)
+        
         urlAsset.resourceLoader.setDelegate(VideoLoadManager.shared, queue: .main)
         
         self.init(asset: urlAsset)

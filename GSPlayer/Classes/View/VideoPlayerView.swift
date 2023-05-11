@@ -169,6 +169,7 @@ open class VideoPlayerView: UIView {
     /// Play a video of the specified url.
     ///
     /// - Parameter url: Can be a local or remote URL
+    @available(iOS 11.0, *)
     open func play(for url: URL) {
         guard playerURL != url else {
             pausedReason = .waitingKeepUp
@@ -195,7 +196,15 @@ open class VideoPlayerView: UIView {
         self.isReplay = false
         self.isLoaded = false
         
-        if playerItem.isEnoughToPlay || url.isFileURL {
+        let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+        if !(videoCacheSize > 1024
+            * 1024 * 10)
+        {
+            state = .loading
+            isLoaded = playerItem.status == .readyToPlay
+            player.play()
+        }
+        else if playerItem.isEnoughToPlay || url.isFileURL {
             state = .none
             isLoaded = playerItem.status == .readyToPlay
             player.play()
@@ -354,9 +363,17 @@ private extension VideoPlayerView {
             }
             
             if self.bufferProgress >= 0.99 || (self.currentBufferDuration - self.currentDuration) > 3 {
-                VideoPreloadManager.shared.start()
+                if #available(iOS 11.0, *) {
+                    VideoPreloadManager.shared.start()
+                } else {
+                    // Fallback on earlier versions
+                }
             } else {
-                VideoPreloadManager.shared.pause()
+                if #available(iOS 11.0, *) {
+                    VideoPreloadManager.shared.pause()
+                } else {
+                    // Fallback on earlier versions
+                }
             }
         }
         
