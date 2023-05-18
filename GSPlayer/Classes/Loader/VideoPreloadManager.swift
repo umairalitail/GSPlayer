@@ -31,7 +31,7 @@ public class VideoPreloadManager: NSObject {
     
     @available(iOS 11.0, *)
     func start() {
-        let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+        let videoCacheSize = VideoCacheManager.remainingCache
         
         guard downloader == nil, waitingQueue.count > 0, videoCacheSize > 1024
                 * 1024 * 10 else {

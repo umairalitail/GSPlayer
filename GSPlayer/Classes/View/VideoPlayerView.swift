@@ -199,7 +199,7 @@ open class VideoPlayerView: UIView {
         self.isReplay = false
         self.isLoaded = false
         
-        let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+        let videoCacheSize = VideoCacheManager.remainingCache
         if !(videoCacheSize > 1024
             * 1024 * 10)
         {

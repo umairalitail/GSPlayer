@@ -57,7 +57,7 @@ extension AVPlayerItem {
     }
     
     convenience init(loader url: URL) {
-        let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+        let videoCacheSize = VideoCacheManager.remainingCache
 
         if url.isFileURL || url.pathExtension == "m3u8" || !(videoCacheSize > 1024
                                                              * 1024 * 10) {
