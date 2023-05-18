@@ -127,11 +127,30 @@ public class VideoCacheHandler {
     }
     
     func cache(data: Data, for range: NSRange) -> Bool {
+        if #available(iOS 11.0, *) {
+            let videoCacheSize = VideoCacheManager.remainingCache
+            guard videoCacheSize > 1024 * 1024 * 10 else { return false }
+        } else {
+            // Fallback on earlier versions
+        }
         objc_sync_enter(writeFileHandle)
         writeFileHandle.seek(toFileOffset: UInt64(range.location))
         writeFileHandle.write(data)
         configuration.add(fragment: range)
         objc_sync_exit(writeFileHandle)
+        DispatchQueue.global(qos: .utility).async {
+            if #available(iOS 11.0, *) {
+                if let availableSpace = VideoCacheManager.getAvailableDiskSpace() {
+                    VideoCacheManager.remainingCache = availableSpace
+                    print("Available Disk Space: \(availableSpace) bytes")
+                } else {
+                    VideoCacheManager.remainingCache = 0
+                    print("Unable to determine the available disk space.")
+                }        } else {
+                // Fallback on earlier versions
+            }
+        }
+        
         return true
         
     }
@@ -146,7 +165,7 @@ public class VideoCacheHandler {
     
     func set(info: VideoInfo) {
         if #available(iOS 11.0, *) {
-            let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+            let videoCacheSize = VideoCacheManager.remainingCache
             guard videoCacheSize > 1024 * 1024 * 10 else { return }
         } else {
             // Fallback on earlier versions
@@ -156,11 +175,24 @@ public class VideoCacheHandler {
         writeFileHandle.truncateFile(atOffset: UInt64(info.contentLength))
         writeFileHandle.synchronizeFile()
         objc_sync_exit(writeFileHandle)
+        DispatchQueue.global(qos: .utility).async {
+            
+            if #available(iOS 11.0, *) {
+                if let availableSpace = VideoCacheManager.getAvailableDiskSpace() {
+                    VideoCacheManager.remainingCache = availableSpace
+                    print("Available Disk Space: \(availableSpace) bytes")
+                } else {
+                    VideoCacheManager.remainingCache = 0
+                    print("Unable to determine the available disk space.")
+                }        } else {
+                    // Fallback on earlier versions
+                }
+        }
     }
     
     func save() {
         if #available(iOS 11.0, *) {
-            let videoCacheSize = VideoCacheManager.calculateRemainingCachedSize()
+            let videoCacheSize = VideoCacheManager.remainingCache
             guard videoCacheSize > 1024 * 1024 * 10 else { return }
         } else {
             // Fallback on earlier versions
@@ -169,6 +201,20 @@ public class VideoCacheHandler {
         writeFileHandle.synchronizeFile()
         configuration.save()
         objc_sync_exit(writeFileHandle)
+        DispatchQueue.global(qos: .utility).async {
+            if #available(iOS 11.0, *) {
+                if let availableSpace = VideoCacheManager.getAvailableDiskSpace() {
+                    VideoCacheManager.remainingCache = availableSpace
+                    print("Available Disk Space: \(availableSpace) bytes")
+                } else {
+                    VideoCacheManager.remainingCache = 0
+                    print("Unable to determine the available disk space.")
+                }
+                
+            } else {
+                // Fallback on earlier versions
+            }
+        }
     }
     
 }
